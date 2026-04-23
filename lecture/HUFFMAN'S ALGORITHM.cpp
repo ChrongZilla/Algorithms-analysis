@@ -124,3 +124,55 @@ std::string decodeHuffman(Node* root, const std::string& encodedString) {
 
     return decodedString; // 최종 해독된 문자열 반환
 }
+
+// 동적 할당된 노드들의 메모리 누수를 막기 위한 트리 해제 함수
+void freeTree(Node* root) {
+    if (root == nullptr) return;
+    freeTree(root->left);
+    freeTree(root->right);
+    delete root;
+}
+
+int main() {
+    // 1. 테스트할 원본 문자열 준비
+    std::string text = "huffman coding is fun!";
+    std::cout << "[1] 원본 문자열: " << text << "\n\n";
+
+    // 2. 문자별 빈도수 계산 (해시 테이블 활용)
+    std::unordered_map<char, int> freqMap;
+    for (char ch : text) {
+        freqMap[ch]++;
+    }
+
+    // 3. 빈도수를 바탕으로 초기 리프 노드 배열(C) 생성
+    std::vector<Node*> C;
+    for (auto const& pair : freqMap) {
+        C.push_back(new Node(pair.first, pair.second));
+    }
+
+    // 4. 허프만 트리 생성
+    // 주의: HuffmanCode 함수 내부에서 priority_queue가 C의 노드들을 
+    // 조합하여 새로운 트리를 만들고 루트를 반환합니다.
+    Node* root = HuffmanCode(C);
+    std::cout << "[2] 허프만 트리 생성 완료!\n\n";
+
+    // 5. 인코딩 테스트
+    std::string encodedText = encodeHuffman(text, root);
+    std::cout << "[3] 인코딩된 이진 문자열:\n" << encodedText << "\n\n";
+
+    // 6. 디코딩 테스트
+    std::string decodedText = decodeHuffman(root, encodedText);
+    std::cout << "[4] 디코딩된 문자열:\n" << decodedText << "\n\n";
+
+    // 결과 확인
+    if (text == decodedText) {
+        std::cout << "성공: 원본과 디코딩된 문자열이 완벽히 일치합니다!\n";
+    } else {
+        std::cout << "실패: 무언가 잘못되었습니다.\n";
+    }
+
+    // 7. 사용이 끝난 트리 메모리 해제
+    freeTree(root);
+
+    return 0;
+}
