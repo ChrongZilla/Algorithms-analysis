@@ -57,6 +57,46 @@ Node* HuffmanCode(std::vector<Node*>& C) {
     return root; // 완성된 트리의 루트 반환
 }
 
+// 인코딩
+// 1. 허프만 코드 테이블을 생성하는 재귀 함수
+void buildCodeTable(Node* root, std::string currentCode, std::unordered_map<char, std::string>& huffmanTable) {
+    // 예외 처리: 노드가 비어있으면 종료
+    if (root == nullptr) {
+        return;
+    }
+
+    // 리프 노드에 도달한 경우 (실제 문자가 저장된 노드)
+    if (root->left == nullptr && root->right == nullptr) {
+        // 테이블에 문자(key)와 그에 해당하는 코드(value)를 저장
+        huffmanTable[root->data] = currentCode;
+    }
+
+    // 왼쪽 자식으로 내려갈 때는 코드에 '0'을 덧붙임
+    buildCodeTable(root->left, currentCode + "0", huffmanTable);
+    
+    // 오른쪽 자식으로 내려갈 때는 코드에 '1'을 덧붙임
+    buildCodeTable(root->right, currentCode + "1", huffmanTable);
+}
+
+// 2. 원본 문자열을 인코딩하는 함수
+std::string encodeHuffman(const std::string& text, Node* root) {
+    // 문자와 코드를 매핑할 해시 테이블(Map) 준비
+    std::unordered_map<char, std::string> huffmanTable;
+    
+    // 루트부터 시작하여 빈 문자열("")로 코드 테이블 생성 시작
+    buildCodeTable(root, "", huffmanTable);
+
+    std::string encodedString = "";
+    
+    // 원본 문자열을 한 글자씩 읽으면서
+    for (char ch : text) {
+        // 테이블에서 해당 문자의 코드를 찾아 결과 문자열에 이어 붙임
+        encodedString += huffmanTable[ch];
+    }
+
+    return encodedString; // 최종 인코딩된 문자열 반환
+}
+
 // 허프만 디코딩
 std::string decodeHuffman(Node* root, const std::string& encodedString) {
     std::string decodedString = "";
