@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "lldb",
+      "request": "launch",
+      "args": [],
+      "cwd": "/Users/gyeongmin/Desktop/HGU/26-1/algorithms/lecture",
+      "program": "/Users/gyeongmin/Desktop/HGU/26-1/algorithms/lecture/build/Debug/outDebug"
+    }
+  ]
+}

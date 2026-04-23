@@ -1,0 +1,86 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+
+// 노드(Node) 구조체 정의
+struct Node {
+    char data;          // 문자 (내부 노드일 경우 임의의 기호)
+    int freq;           // 빈도수 (수도코드의 f[...])
+    Node* left;         // 왼쪽 자식 (수도코드의 left[...])
+    Node* right;        // 오른쪽 자식 (수도코드의 right[...])
+
+    // 생성자
+    Node(char data, int freq) : data(data), freq(freq), left(nullptr), right(nullptr) {}
+};
+
+// 최소 힙(Min-Heap)을 위한 비교 연산자 구조체
+struct Compare {
+    bool operator()(Node* l, Node* r) {
+        // 빈도수(freq)가 작은 노드가 큐의 top()에 오도록 설정
+        return l->freq > r->freq;
+    }
+};
+
+// 허프만 코드 트리 생성 함수 (수도코드 매핑)
+Node* HuffmanCode(std::vector<Node*>& C) {
+    // 1. n <- |C|
+    int n = C.size(); 
+    
+    // 2. Q <- C (최소 힙 우선순위 큐 초기화)
+    std::priority_queue<Node*, std::vector<Node*>, Compare> Q(C.begin(), C.end());
+
+    // 3. for i = 1 ... n - 1
+    for (int i = 1; i < n; ++i) {
+        // 4. allocate a new node z
+        // (내부 노드는 특정 문자가 없으므로 임의의 문자 '$'와 빈도 0으로 초기화)
+        Node* z = new Node('$', 0); 
+        
+        // 5. left[z] <- Extract-Min(Q)
+        z->left = Q.top();
+        Q.pop();
+        
+        // 6. right[z] <- Extract-Min(Q)
+        z->right = Q.top();
+        Q.pop();
+        
+        // 7. f[z] <- f[left[z]] + f[right[z]]
+        z->freq = z->left->freq + z->right->freq;
+        
+        // 8. Insert(Q, z)
+        Q.push(z);
+    }
+
+    // 9. return Extract-Min(Q)
+    Node* root = Q.top();
+    Q.pop();
+    
+    return root; // 완성된 트리의 루트 반환
+}
+
+// 허프만 디코딩
+std::string decodeHuffman(Node* root, const std::string& encodedString) {
+    std::string decodedString = "";
+    Node* current = root; // 항상 root에서 탐색 시작
+
+    // 인코딩된 문자열(예: "0100011010")을 한 글자씩 읽기
+    for (char bit : encodedString) {
+        
+        // 1. '0'이면 왼쪽 자식으로, '1'이면 오른쪽 자식으로 이동
+        if (bit == '0') {
+            current = current->left;
+        } else if (bit == '1') {
+            current = current->right;
+        }
+
+        // 2. 리프 노드에 도달했는지 확인 (왼쪽, 오른쪽 자식이 모두 없는 경우)
+        if (current->left == nullptr && current->right == nullptr) {
+            // 해당 문자를 결과 문자열에 추가
+            decodedString += current->data; 
+            
+            // 3. 다음 문자를 해독하기 위해 다시 root로 돌아감 (자료의 빨간 글씨 부분)
+            current = root; 
+        }
+    }
+
+    return decodedString; // 최종 해독된 문자열 반환
+}
