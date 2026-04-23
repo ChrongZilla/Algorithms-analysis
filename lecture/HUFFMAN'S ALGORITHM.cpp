@@ -151,8 +151,7 @@ int main() {
     }
 
     // 4. 허프만 트리 생성
-    // 주의: HuffmanCode 함수 내부에서 priority_queue가 C의 노드들을 
-    // 조합하여 새로운 트리를 만들고 루트를 반환합니다.
+    // 주의: HuffmanCode 함수 내부에서 priority_queue가 C의 노드들을 조합하여 새로운 트리를 만들고 루트를 반환합니다.
     Node* root = HuffmanCode(C);
     std::cout << "[2] 허프만 트리 생성 완료!\n\n";
 
